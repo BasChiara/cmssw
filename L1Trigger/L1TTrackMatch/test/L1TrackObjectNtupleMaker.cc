@@ -20,6 +20,8 @@
 // DATA FORMATS HEADERS
 #include "DataFormats/Common/interface/Handle.h"
 #include "DataFormats/Common/interface/Ref.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/Candidate/interface/Candidate.h"
 
 #include "DataFormats/L1TrackTrigger/interface/TTTypes.h"
 #include "DataFormats/L1TrackTrigger/interface/TTCluster.h"
@@ -275,14 +277,22 @@ private:
   //gen particles
   std::vector<float>* m_gen_pt;
   std::vector<float>* m_gen_phi;
-  std::vector<float>* m_gen_pdgid;
+  std::vector<float>* m_gen_eta;
+  std::vector<int>* m_gen_pdgid;
   std::vector<float>* m_gen_z0;
+  std::vector<float>* m_gen_x0;
+  std::vector<float>* m_gen_y0;
+  std::vector<int>* m_gen_mother_pdgid;
+  std::vector<float>* m_gen_mother_pt;
+  std::vector<float>* m_gen_mother_eta;
+  std::vector<float>* m_gen_mother_phi;
 
   // all L1 tracks (prompt)
   std::vector<float>* m_trk_pt;
   std::vector<float>* m_trk_eta;
   std::vector<float>* m_trk_phi;
   std::vector<float>* m_trk_phi_local;
+  std::vector<int>* m_trk_charge;
   std::vector<float>* m_trk_d0;  // (filled if nFitPar==5, else 999)
   std::vector<float>* m_trk_z0;
   std::vector<float>* m_trk_chi2;
@@ -291,6 +301,7 @@ private:
   std::vector<float>* m_trk_chi2rz;
   std::vector<float>* m_trk_bendchi2;
   std::vector<float>* m_trk_MVA1;
+  std::vector<float>* m_trk_MVAQuality;
   std::vector<int>* m_trk_nstub;
   std::vector<int>* m_trk_lhits;
   std::vector<int>* m_trk_dhits;
@@ -707,6 +718,7 @@ void L1TrackObjectNtupleMaker::endJob() {
   delete m_trk_eta;
   delete m_trk_phi;
   delete m_trk_phi_local;
+  delete m_trk_charge;
   delete m_trk_z0;
   delete m_trk_d0;
   delete m_trk_chi2;
@@ -715,6 +727,7 @@ void L1TrackObjectNtupleMaker::endJob() {
   delete m_trk_chi2rz;
   delete m_trk_bendchi2;
   delete m_trk_MVA1;
+  delete m_trk_MVAQuality;
   delete m_trk_nstub;
   delete m_trk_lhits;
   delete m_trk_dhits;
@@ -809,8 +822,15 @@ void L1TrackObjectNtupleMaker::endJob() {
 
   delete m_gen_pt;
   delete m_gen_phi;
+  delete m_gen_eta;
   delete m_gen_pdgid;
   delete m_gen_z0;
+  delete m_gen_x0;
+  delete m_gen_y0;
+  delete m_gen_mother_pdgid;
+  delete m_gen_mother_pt;
+  delete m_gen_mother_eta;
+  delete m_gen_mother_phi;
 
   delete m_matchtrk_pt;
   delete m_matchtrk_eta;
@@ -942,6 +962,7 @@ void L1TrackObjectNtupleMaker::beginJob() {
   m_trk_eta = new std::vector<float>;
   m_trk_phi = new std::vector<float>;
   m_trk_phi_local = new std::vector<float>;
+  m_trk_charge = new std::vector<int>;
   m_trk_z0 = new std::vector<float>;
   m_trk_d0 = new std::vector<float>;
   m_trk_chi2 = new std::vector<float>;
@@ -950,6 +971,7 @@ void L1TrackObjectNtupleMaker::beginJob() {
   m_trk_chi2rz = new std::vector<float>;
   m_trk_bendchi2 = new std::vector<float>;
   m_trk_MVA1 = new std::vector<float>;
+  m_trk_MVAQuality = new std::vector<float>;
   m_trk_nstub = new std::vector<int>;
   m_trk_lhits = new std::vector<int>;
   m_trk_dhits = new std::vector<int>;
@@ -1043,9 +1065,16 @@ void L1TrackObjectNtupleMaker::beginJob() {
   m_tp_charge = new std::vector<int>;
 
   m_gen_pt = new std::vector<float>;
+  m_gen_eta = new std::vector<float>;
   m_gen_phi = new std::vector<float>;
-  m_gen_pdgid = new std::vector<float>;
+  m_gen_pdgid = new std::vector<int>;
   m_gen_z0 = new std::vector<float>;
+  m_gen_x0 = new std::vector<float>;
+  m_gen_y0 = new std::vector<float>;
+  m_gen_mother_pdgid = new std::vector<int>;
+  m_gen_mother_pt = new std::vector<float>;
+  m_gen_mother_eta = new std::vector<float>;
+  m_gen_mother_phi = new std::vector<float>;
 
   m_matchtrk_pt = new std::vector<float>;
   m_matchtrk_eta = new std::vector<float>;
@@ -1173,6 +1202,7 @@ void L1TrackObjectNtupleMaker::beginJob() {
     eventTree->Branch("trk_chi2rz", &m_trk_chi2rz);
     eventTree->Branch("trk_bendchi2", &m_trk_bendchi2);
     eventTree->Branch("trk_MVA1", &m_trk_MVA1);
+    eventTree->Branch("trk_MVAquality", &m_trk_MVAQuality);
     eventTree->Branch("trk_nstub", &m_trk_nstub);
     eventTree->Branch("trk_lhits", &m_trk_lhits);
     eventTree->Branch("trk_dhits", &m_trk_dhits);
@@ -1334,9 +1364,16 @@ void L1TrackObjectNtupleMaker::beginJob() {
   eventTree->Branch("MC_lep", &m_MC_lep);
   eventTree->Branch("pv_MC", &m_pv_MC);
   eventTree->Branch("gen_pt", &m_gen_pt);
+  eventTree->Branch("gen_eta", &m_gen_eta);
   eventTree->Branch("gen_phi", &m_gen_phi);
   eventTree->Branch("gen_pdgid", &m_gen_pdgid);
   eventTree->Branch("gen_z0", &m_gen_z0);
+  eventTree->Branch("gen_x0", &m_gen_x0);
+  eventTree->Branch("gen_y0", &m_gen_y0);
+  eventTree->Branch("gen_mother_pdgid", &m_gen_mother_pdgid);
+  eventTree->Branch("gen_mother_pt", &m_gen_mother_pt);
+  eventTree->Branch("gen_mother_eta", &m_gen_mother_eta);
+  eventTree->Branch("gen_mother_phi", &m_gen_mother_phi);
 
   if (SaveTrackJets) {
     if (Displaced == "Prompt" || Displaced == "Both") {
@@ -1438,6 +1475,7 @@ void L1TrackObjectNtupleMaker::analyze(const edm::Event& iEvent, const edm::Even
     m_trk_eta->clear();
     m_trk_phi->clear();
     m_trk_phi_local->clear();
+    m_trk_charge->clear();
     m_trk_d0->clear();
     m_trk_z0->clear();
     m_trk_chi2->clear();
@@ -1446,6 +1484,7 @@ void L1TrackObjectNtupleMaker::analyze(const edm::Event& iEvent, const edm::Even
     m_trk_chi2rz->clear();
     m_trk_bendchi2->clear();
     m_trk_MVA1->clear();
+    m_trk_MVAQuality->clear();
     m_trk_nstub->clear();
     m_trk_lhits->clear();
     m_trk_dhits->clear();
@@ -1540,9 +1579,16 @@ void L1TrackObjectNtupleMaker::analyze(const edm::Event& iEvent, const edm::Even
   m_tp_charge->clear();
 
   m_gen_pt->clear();
+  m_gen_eta->clear();
   m_gen_phi->clear();
   m_gen_pdgid->clear();
   m_gen_z0->clear();
+  m_gen_x0->clear();
+  m_gen_y0->clear();
+  m_gen_mother_pdgid->clear();
+  m_gen_mother_pt->clear();
+  m_gen_mother_eta->clear();
+  m_gen_mother_phi->clear();
 
   if (Displaced == "Prompt" || Displaced == "Both") {
     m_matchtrk_pt->clear();
@@ -1807,35 +1853,58 @@ void L1TrackObjectNtupleMaker::analyze(const edm::Event& iEvent, const edm::Even
   }
 
   //Loop over gen particles
-  if (GenParticleHandle.isValid()) {
+  if (GenParticleHandle.isValid()) { // FIXME : take care of FSR
     vector<reco::GenParticle>::const_iterator genpartIter;
-
+    
+    if (DebugMode) edm::LogVerbatim("GenParticles") << "---- GEN PARTICLES ----" << std::endl;
     float zvtx_gen = -999;
+    //float xvtx_gen = -999;
+    //float yvtx_gen = -999;
     float trueMETx = 0;
     float trueMETy = 0;
     trueMET = 0;
     for (genpartIter = GenParticleHandle->begin(); genpartIter != GenParticleHandle->end(); ++genpartIter) {
-      int status = genpartIter->status();
-      if (status != 1)
-        continue;
+      
+      if (genpartIter->status() != 1) continue; // select only final state particles
+
       zvtx_gen = genpartIter->vz();  //for gen vertex
       int id = genpartIter->pdgId();
       bool isNeutrino = false;
-      if ((std::abs(id) == 12 || std::abs(id) == 14 || std::abs(id) == 16))
-        isNeutrino = true;
-      if (isNeutrino || id == 1000022) {
+      isNeutrino = (std::abs(id) == 12 || std::abs(id) == 14 || std::abs(id) == 16); 
+      if (isNeutrino || id == 1000022) { // SM neutrino or SUSY particle -> MET
         trueMETx += genpartIter->pt() * cos(genpartIter->phi());
         trueMETy += genpartIter->pt() * sin(genpartIter->phi());
       }
 
       m_gen_pt->push_back(genpartIter->pt());
+      m_gen_eta->push_back(genpartIter->eta());
       m_gen_phi->push_back(genpartIter->phi());
       m_gen_pdgid->push_back(genpartIter->pdgId());
-      m_gen_z0->push_back(zvtx_gen);
-    }
+      m_gen_z0->push_back(genpartIter->vz());
+      m_gen_x0->push_back(genpartIter->vx());
+      m_gen_y0->push_back(genpartIter->vy());
+      
+
+      const reco::Candidate* mother = genpartIter->mother(0);
+      if (mother != nullptr) {
+         m_gen_mother_pdgid->push_back(mother->pdgId());
+         m_gen_mother_pt->push_back(mother->pt());
+         m_gen_mother_eta->push_back(mother->eta());
+         m_gen_mother_phi->push_back(mother->phi());
+      } else {
+         m_gen_mother_pdgid->push_back(-999);
+         m_gen_mother_pt->push_back(-999);
+         m_gen_mother_eta->push_back(-999);
+         m_gen_mother_phi->push_back(-999);
+      }
+      
+      if (DebugMode){
+         edm::LogVerbatim("GenParticles") << "   pdgID = " << genpartIter->pdgId() << ", pt = " << genpartIter->pt() << ", phi = " << genpartIter->phi() << ", z0 = " << zvtx_gen << " mother-pdgId "<< mother->pdgId() << std::endl;
+      }
+    }// loop on GenParticles
 
     trueMET = sqrt(trueMETx * trueMETx + trueMETy * trueMETy);
-    m_pv_MC->push_back(zvtx_gen);
+    m_pv_MC->push_back(zvtx_gen); // FIXME - why only one gen vertex? should we save all gen vertices?
   } else {
     edm::LogWarning("DataNotFound") << "\nWarning: GenParticleHandle not found in the event" << std::endl;
   }
@@ -1973,6 +2042,7 @@ void L1TrackObjectNtupleMaker::analyze(const edm::Event& iEvent, const edm::Even
       float tmp_trk_chi2rz = iterL1Track->chi2ZRed();
       float tmp_trk_bendchi2 = iterL1Track->stubPtConsistency();
       float tmp_trk_MVA1 = iterL1Track->trkMVA1();
+      float tmp_trk_MVAQuality = iterL1Track->getMVAQuality();
 
       std::vector<edm::Ref<edmNew::DetSetVector<TTStub<Ref_Phase2TrackerDigi_>>, TTStub<Ref_Phase2TrackerDigi_>>>
           stubRefs = iterL1Track->getStubRefs();
@@ -2060,6 +2130,7 @@ void L1TrackObjectNtupleMaker::analyze(const edm::Event& iEvent, const edm::Even
       m_trk_chi2rz->push_back(tmp_trk_chi2rz);
       m_trk_bendchi2->push_back(tmp_trk_bendchi2);
       m_trk_MVA1->push_back(tmp_trk_MVA1);
+      m_trk_MVAQuality->push_back(tmp_trk_MVAQuality);
       m_trk_nstub->push_back(tmp_trk_nstub);
       m_trk_dhits->push_back(tmp_trk_dhits);
       m_trk_lhits->push_back(tmp_trk_lhits);
@@ -2166,6 +2237,7 @@ void L1TrackObjectNtupleMaker::analyze(const edm::Event& iEvent, const edm::Even
       float tmp_trk_eta = iterL1Track->momentum().eta();
       float tmp_trk_phi = iterL1Track->momentum().phi();
       float tmp_trk_phi_local = iterL1Track->localPhi();
+      int tmp_trk_charge = 0;
       float tmp_trk_z0 = iterL1Track->z0();            //cm
       int tmp_trk_nFitPars = iterL1Track->nFitPars();  //4 or 5
 
@@ -2258,6 +2330,7 @@ void L1TrackObjectNtupleMaker::analyze(const edm::Event& iEvent, const edm::Even
       m_trkExt_pt->push_back(tmp_trk_pt);
       m_trkExt_eta->push_back(tmp_trk_eta);
       m_trkExt_phi->push_back(tmp_trk_phi);
+      m_trk_charge->push_back(tmp_trk_charge); // not implemented in extended tracks, set to 0 for now
       m_trkExt_phi_local->push_back(tmp_trk_phi_local);
       m_trkExt_z0->push_back(tmp_trk_z0);
       if (tmp_trk_nFitPars == 5)

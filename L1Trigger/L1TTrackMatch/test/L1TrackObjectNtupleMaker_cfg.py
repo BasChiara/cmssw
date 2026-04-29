@@ -34,16 +34,28 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic', '')
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
-process.MessageLogger.cerr.INFO.limit = cms.untracked.int32(0) # default: 0
+process.MessageLogger = cms.Service("MessageLogger",
+    destinations = cms.untracked.vstring('cerr'),
+    categories = cms.untracked.vstring('L1TrackObjectNtupleMaker'),
+    cerr = cms.untracked.PSet(
+        threshold = cms.untracked.string('INFO'),
+        default = cms.untracked.PSet(limit = cms.untracked.int32(0)),
+        L1TrackObjectNtupleMaker = cms.untracked.PSet(limit = cms.untracked.int32(-1)),
+        #GenParticles = cms.untracked.PSet(limit = cms.untracked.int32(-1)),
+    ),
+)
+#process.MessageLogger.cerr.INFO.limit = cms.untracked.int32(0) # default: 0
 
 ############################################################
 # input and output
 ############################################################
 
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10))
+process.options.numberOfThreads = 2 # enable multi-thread
 
 readFiles = cms.untracked.vstring(
-                                  '/store/relval/CMSSW_13_0_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/130X_mcRun4_realistic_v2_2026D95noPU-v1/00000/16f6615d-f98c-475f-ad33-0e89934b6c7f.root'
+                                  #'/store/mc/Phase2Spring24DIGIRECOMiniAOD/BsToTauTau_3Pi_SoftQCDnonD_TuneCP5_14TeV-pythia8-evtgen/GEN-SIM-DIGI-RAW-MINIAOD/PU200_AllTP_140X_mcRun4_realistic_v4-v1/2530000/05c03c2e-3e27-4044-83de-d485f5c19684.root'
+                                 '/store/mc/Phase2Spring24DIGIRECOMiniAOD/MinBias_TuneCP5_14TeV-pythia8/GEN-SIM-DIGI-RAW-MINIAOD/PU200ALCA_140X_mcRun4_realistic_v4-v2/130000/d37d8724-29b6-4cbc-ba8a-5fd3bf866f6e.root'
 )
 secFiles = cms.untracked.vstring()
 
@@ -59,7 +71,7 @@ process.Timing = cms.Service("Timing",
   useJobReport = cms.untracked.bool(True)
 )
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string('GTTObjects_ttbar200PU_v2p2.root'), closeFileFast = cms.untracked.bool(True))
+process.TFileService = cms.Service("TFileService", fileName = cms.string('L1TrackObject_output.root'), closeFileFast = cms.untracked.bool(True))
 
 
 ############################################################
@@ -176,7 +188,7 @@ elif (L1TRKALGO == 'HYBRID_PROMPTANDDISP'):
 
 process.L1TrackNtuple = cms.EDAnalyzer('L1TrackObjectNtupleMaker',
         MyProcess = cms.int32(1),
-        DebugMode = cms.bool(False),      # printout lots of debug statements
+        DebugMode = cms.bool(True),      # printout lots of debug statements
         SaveAllTracks = cms.bool(True),  # save *all* L1 tracks, not just truth matched to primary particle
         SaveStubs = cms.bool(False),      # save some info for *all* stubs
         Displaced = cms.string(DISPLACED),# "Prompt", "Displaced", "Both"

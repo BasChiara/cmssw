@@ -1,0 +1,23 @@
+common :
+  data:
+    lumimask : None
+    splitting: -1 
+    globaltag: None
+  mc:
+    splitting: 5
+    globaltag: auto:phase2_realistic
+
+samples:
+  BsToTauTau_3pi:
+    dataset: /BsToTauTau_3Pi_SoftQCDnonD_TuneCP5_14TeV-pythia8-evtgen/Phase2Spring24DIGIRECOMiniAOD-PU200_AllTP_140X_mcRun4_realistic_v4-v1/GEN-SIM-DIGI-RAW-MINIAOD
+    splitting : 1
+    isMC : True
+  HToTauTau_3pi:
+    dataset: /GluGluHToTauTau_M-125_TuneCP5_14TeV-powheg-pythia8/Phase2Spring24DIGIRECOMiniAOD-PU200_Trk1GeV_140X_mcRun4_realistic_v4-v2/GEN-SIM-DIGI-RAW-MINIAOD
+    splitting : 1
+    isMC : True
+  MinBias_PU200:
+    dataset: /MinBias_TuneCP5_14TeV-pythia8/Phase2Spring24DIGIRECOMiniAOD-PU200ALCA_140X_mcRun4_realistic_v4-v2/GEN-SIM-DIGI-RAW-MINIAOD
+    filelist : datasample/MinBias_PU200.txt 
+    splitting : 5
+    isMC : True

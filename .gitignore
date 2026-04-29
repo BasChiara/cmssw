@@ -21,3 +21,13 @@ __init__.py
 
 #ignore mac specific file
 .DS_Store
+
+# output
+*.root
+*.out
+*.err
+*.log
+*.txt
+
+# crab 
+crab*
