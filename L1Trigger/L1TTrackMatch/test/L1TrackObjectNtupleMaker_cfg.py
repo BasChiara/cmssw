@@ -36,7 +36,10 @@ process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase2_realistic', '')
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.MessageLogger = cms.Service("MessageLogger",
     destinations = cms.untracked.vstring('cerr'),
-    categories = cms.untracked.vstring('L1TrackObjectNtupleMaker'),
+    categories = cms.untracked.vstring(
+        'L1TrackObjectNtupleMaker',
+        #'GenParticles',
+    ),
     cerr = cms.untracked.PSet(
         threshold = cms.untracked.string('INFO'),
         default = cms.untracked.PSet(limit = cms.untracked.int32(0)),
@@ -50,12 +53,12 @@ process.MessageLogger = cms.Service("MessageLogger",
 # input and output
 ############################################################
 
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(10))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))
 process.options.numberOfThreads = 2 # enable multi-thread
 
 readFiles = cms.untracked.vstring(
-                                  #'/store/mc/Phase2Spring24DIGIRECOMiniAOD/BsToTauTau_3Pi_SoftQCDnonD_TuneCP5_14TeV-pythia8-evtgen/GEN-SIM-DIGI-RAW-MINIAOD/PU200_AllTP_140X_mcRun4_realistic_v4-v1/2530000/05c03c2e-3e27-4044-83de-d485f5c19684.root'
-                                 '/store/mc/Phase2Spring24DIGIRECOMiniAOD/MinBias_TuneCP5_14TeV-pythia8/GEN-SIM-DIGI-RAW-MINIAOD/PU200ALCA_140X_mcRun4_realistic_v4-v2/130000/d37d8724-29b6-4cbc-ba8a-5fd3bf866f6e.root'
+                                '/store/mc/Phase2Spring24DIGIRECOMiniAOD/BsToTauTau_3Pi_SoftQCDnonD_TuneCP5_14TeV-pythia8-evtgen/GEN-SIM-DIGI-RAW-MINIAOD/PU200_AllTP_140X_mcRun4_realistic_v4-v1/2530000/05c03c2e-3e27-4044-83de-d485f5c19684.root'
+                                 #'/store/mc/Phase2Spring24DIGIRECOMiniAOD/MinBias_TuneCP5_14TeV-pythia8/GEN-SIM-DIGI-RAW-MINIAOD/PU200ALCA_140X_mcRun4_realistic_v4-v2/130000/d37d8724-29b6-4cbc-ba8a-5fd3bf866f6e.root'
 )
 secFiles = cms.untracked.vstring()
 

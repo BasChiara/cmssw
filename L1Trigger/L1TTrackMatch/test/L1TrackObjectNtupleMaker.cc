@@ -286,6 +286,18 @@ private:
   std::vector<float>* m_gen_mother_pt;
   std::vector<float>* m_gen_mother_eta;
   std::vector<float>* m_gen_mother_phi;
+  std::vector<int>* m_gen_tau_pdgid;
+  std::vector<float>* m_gen_tau_pt;
+  std::vector<float>* m_gen_tau_z0;
+  std::vector<float>* m_gen_tau_eta;
+  std::vector<float>* m_gen_tau_phi;
+  std::vector<int>* m_gen_tau_mother_pdgid;
+  std::vector<int>* m_gen_tau_ndau;
+  std::vector<int>* m_gen_tau_dau_pdgid;
+  std::vector<float>* m_gen_tau_dau_pt;
+  std::vector<float>* m_gen_tau_dau_eta;
+  std::vector<float>* m_gen_tau_dau_phi;
+  std::vector<float>* m_gen_tau_dau_z0;
 
   // all L1 tracks (prompt)
   std::vector<float>* m_trk_pt;
@@ -831,6 +843,19 @@ void L1TrackObjectNtupleMaker::endJob() {
   delete m_gen_mother_pt;
   delete m_gen_mother_eta;
   delete m_gen_mother_phi;
+  delete m_gen_tau_pdgid;
+  delete m_gen_tau_pt;
+  delete m_gen_tau_z0;
+  delete m_gen_tau_eta;
+  delete m_gen_tau_phi;
+  delete m_gen_tau_mother_pdgid;
+  delete m_gen_tau_ndau;
+  delete m_gen_tau_dau_pdgid;
+  delete m_gen_tau_dau_pt;
+  delete m_gen_tau_dau_eta;
+  delete m_gen_tau_dau_phi;
+  delete m_gen_tau_dau_z0;
+  
 
   delete m_matchtrk_pt;
   delete m_matchtrk_eta;
@@ -1075,6 +1100,18 @@ void L1TrackObjectNtupleMaker::beginJob() {
   m_gen_mother_pt = new std::vector<float>;
   m_gen_mother_eta = new std::vector<float>;
   m_gen_mother_phi = new std::vector<float>;
+  m_gen_tau_pdgid = new std::vector<int>;
+  m_gen_tau_pt = new std::vector<float>;
+  m_gen_tau_eta = new std::vector<float>;
+  m_gen_tau_phi = new std::vector<float>;
+  m_gen_tau_z0 = new std::vector<float>;
+  m_gen_tau_mother_pdgid = new std::vector<int>;
+  m_gen_tau_ndau = new std::vector<int>;
+  m_gen_tau_dau_pdgid = new std::vector<int>;
+  m_gen_tau_dau_pt = new std::vector<float>;
+  m_gen_tau_dau_eta = new std::vector<float>;
+  m_gen_tau_dau_phi = new std::vector<float>;
+  m_gen_tau_dau_z0 = new std::vector<float>;
 
   m_matchtrk_pt = new std::vector<float>;
   m_matchtrk_eta = new std::vector<float>;
@@ -1374,6 +1411,19 @@ void L1TrackObjectNtupleMaker::beginJob() {
   eventTree->Branch("gen_mother_pt", &m_gen_mother_pt);
   eventTree->Branch("gen_mother_eta", &m_gen_mother_eta);
   eventTree->Branch("gen_mother_phi", &m_gen_mother_phi);
+  eventTree->Branch("gen_tau_pdgid", m_gen_tau_pdgid);
+  eventTree->Branch("gen_tau_pt", m_gen_tau_pt);
+  eventTree->Branch("gen_tau_eta", m_gen_tau_eta);
+  eventTree->Branch("gen_tau_phi", m_gen_tau_phi);
+  eventTree->Branch("gen_tau_z0", m_gen_tau_z0);
+  eventTree->Branch("gen_tau_mother_pdgid", m_gen_tau_mother_pdgid);
+  eventTree->Branch("gen_tau_ndau", m_gen_tau_ndau);
+  eventTree->Branch("gen_tau_dau_pdgid", m_gen_tau_dau_pdgid);
+  eventTree->Branch("gen_tau_dau_pt", m_gen_tau_dau_pt);
+  eventTree->Branch("gen_tau_dau_eta", m_gen_tau_dau_eta);
+  eventTree->Branch("gen_tau_dau_phi", m_gen_tau_dau_phi);
+  eventTree->Branch("gen_tau_dau_z0", m_gen_tau_dau_z0);
+
 
   if (SaveTrackJets) {
     if (Displaced == "Prompt" || Displaced == "Both") {
@@ -1589,6 +1639,18 @@ void L1TrackObjectNtupleMaker::analyze(const edm::Event& iEvent, const edm::Even
   m_gen_mother_pt->clear();
   m_gen_mother_eta->clear();
   m_gen_mother_phi->clear();
+  m_gen_tau_pdgid->clear();
+  m_gen_tau_pt->clear();
+  m_gen_tau_eta->clear();
+  m_gen_tau_phi->clear();
+  m_gen_tau_z0->clear();
+  m_gen_tau_mother_pdgid->clear();
+  m_gen_tau_ndau->clear();
+  m_gen_tau_dau_pdgid->clear();
+  m_gen_tau_dau_pt->clear();
+  m_gen_tau_dau_eta->clear();
+  m_gen_tau_dau_phi->clear();
+  m_gen_tau_dau_z0->clear();
 
   if (Displaced == "Prompt" || Displaced == "Both") {
     m_matchtrk_pt->clear();
@@ -1852,23 +1914,71 @@ void L1TrackObjectNtupleMaker::analyze(const edm::Event& iEvent, const edm::Even
                       TTTrackExtendedSelectedAssociatedEmulationForEtMissHandle);
   }
 
-  //Loop over gen particles
-  if (GenParticleHandle.isValid()) { // FIXME : take care of FSR
+  
+
+  // Loop over gen particles
+  if (GenParticleHandle.isValid()) { 
     vector<reco::GenParticle>::const_iterator genpartIter;
     
     if (DebugMode) edm::LogVerbatim("GenParticles") << "---- GEN PARTICLES ----" << std::endl;
+    if (DebugMode) {
+      edm::LogVerbatim("GenParticles") << Form("Event %lld: nGenParticles = %ld", iEvent.id().event(), GenParticleHandle->size())<< std::endl;
+    }
     float zvtx_gen = -999;
     //float xvtx_gen = -999;
     //float yvtx_gen = -999;
     float trueMETx = 0;
     float trueMETy = 0;
     trueMET = 0;
+    int default_val = -999;
     for (genpartIter = GenParticleHandle->begin(); genpartIter != GenParticleHandle->end(); ++genpartIter) {
-      
-      if (genpartIter->status() != 1) continue; // select only final state particles
 
+      if (genpartIter->status() != 1 && genpartIter->status() != 2) continue; // select only final state and decaying particles
+      
       zvtx_gen = genpartIter->vz();  //for gen vertex
       int id = genpartIter->pdgId();
+
+      // mother particle
+      const reco::Candidate* mother = genpartIter->mother(0);
+      
+      int mother_pdgid = default_val;
+      float mother_pt = default_val, mother_eta = default_val, mother_phi = default_val;
+      if (mother != nullptr) {
+        mother_pdgid  = mother->pdgId();
+        mother_pt     = mother->pt();
+        mother_eta    = mother->eta();
+        mother_phi    = mother->phi();
+      }
+      
+      // Bs-> tau tau (FIXME: more general in the future)gen_tau_pt
+      if (std::abs(id) == 15 && std::abs(mother_pdgid) == 531) {
+        m_gen_tau_pdgid->push_back(id);
+        m_gen_tau_mother_pdgid->push_back(mother_pdgid);
+        m_gen_tau_pt->push_back(genpartIter->pt());
+        m_gen_tau_eta->push_back(genpartIter->eta());
+        m_gen_tau_phi->push_back(genpartIter->phi());
+        m_gen_tau_z0->push_back(genpartIter->vz());
+        int ndau = genpartIter->numberOfDaughters();
+        m_gen_tau_ndau->push_back(ndau);
+        for (int idau = 0; idau < ndau; idau++) {
+          const reco::Candidate* dau = genpartIter->daughter(idau);
+          m_gen_tau_dau_pdgid->push_back(dau->pdgId());
+          m_gen_tau_dau_pt->push_back(dau->pt());
+          m_gen_tau_dau_eta->push_back(dau->eta());
+          m_gen_tau_dau_phi->push_back(dau->phi());
+          m_gen_tau_dau_z0->push_back(dau->vz());
+        } 
+        edm::LogVerbatim("GenParticles") << Form(" Tau from = %d decay in %d ", mother_pdgid, ndau) << std::endl;    
+      } 
+      if (DebugMode){
+         edm::LogVerbatim("GenParticles") << Form("  pdgID = %d | mother-pdgID = %d | status = %d | pT = %.3f GeV | eta = %.3f ||", genpartIter->pdgId(),  mother_pdgid, genpartIter->status(), genpartIter->pt(), genpartIter->eta()) << std::endl;
+      }
+      
+      
+      // save only status 1 particles
+      if (genpartIter->status() != 1) continue;
+      
+      // MET
       bool isNeutrino = false;
       isNeutrino = (std::abs(id) == 12 || std::abs(id) == 14 || std::abs(id) == 16); 
       if (isNeutrino || id == 1000022) { // SM neutrino or SUSY particle -> MET
@@ -1884,23 +1994,11 @@ void L1TrackObjectNtupleMaker::analyze(const edm::Event& iEvent, const edm::Even
       m_gen_x0->push_back(genpartIter->vx());
       m_gen_y0->push_back(genpartIter->vy());
       
-
-      const reco::Candidate* mother = genpartIter->mother(0);
-      if (mother != nullptr) {
-         m_gen_mother_pdgid->push_back(mother->pdgId());
-         m_gen_mother_pt->push_back(mother->pt());
-         m_gen_mother_eta->push_back(mother->eta());
-         m_gen_mother_phi->push_back(mother->phi());
-      } else {
-         m_gen_mother_pdgid->push_back(-999);
-         m_gen_mother_pt->push_back(-999);
-         m_gen_mother_eta->push_back(-999);
-         m_gen_mother_phi->push_back(-999);
-      }
+      m_gen_mother_pdgid->push_back(mother_pdgid);
+      m_gen_mother_pt->push_back(mother_pt);
+      m_gen_mother_eta->push_back(mother_eta);
+      m_gen_mother_phi->push_back(mother_phi);
       
-      if (DebugMode){
-         edm::LogVerbatim("GenParticles") << "   pdgID = " << genpartIter->pdgId() << ", pt = " << genpartIter->pt() << ", phi = " << genpartIter->phi() << ", z0 = " << zvtx_gen << " mother-pdgId "<< mother->pdgId() << std::endl;
-      }
     }// loop on GenParticles
 
     trueMET = sqrt(trueMETx * trueMETx + trueMETy * trueMETy);
