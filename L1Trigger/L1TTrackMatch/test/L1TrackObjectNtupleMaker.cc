@@ -333,6 +333,7 @@ private:
   std::vector<float>* m_trk_chi2rz;
   std::vector<float>* m_trk_bendchi2;
   std::vector<float>* m_trk_MVA1;
+  std::vector<float>* m_trk_MVAQuality;
   std::vector<int>* m_trk_nstub;
   std::vector<int>* m_trk_lhits;
   std::vector<int>* m_trk_dhits;
@@ -839,6 +840,7 @@ void L1TrackObjectNtupleMaker::endJob() {
   delete m_trk_chi2rz;
   delete m_trk_bendchi2;
   delete m_trk_MVA1;
+  delete m_trk_MVAQuality;
   delete m_trk_nstub;
   delete m_trk_lhits;
   delete m_trk_dhits;
@@ -1212,6 +1214,7 @@ void L1TrackObjectNtupleMaker::beginJob() {
   m_trk_chi2rz = new std::vector<float>;
   m_trk_bendchi2 = new std::vector<float>;
   m_trk_MVA1 = new std::vector<float>;
+  m_trk_MVAQuality = new std::vector<float>;
   m_trk_nstub = new std::vector<int>;
   m_trk_lhits = new std::vector<int>;
   m_trk_dhits = new std::vector<int>;
@@ -1520,6 +1523,7 @@ void L1TrackObjectNtupleMaker::beginJob() {
     eventTree->Branch("trk_chi2rz", &m_trk_chi2rz);
     eventTree->Branch("trk_bendchi2", &m_trk_bendchi2);
     eventTree->Branch("trk_MVA1", &m_trk_MVA1);
+    eventTree->Branch("trk_MVAquality", &m_trk_MVAQuality);
     eventTree->Branch("trk_nstub", &m_trk_nstub);
     eventTree->Branch("trk_lhits", &m_trk_lhits);
     eventTree->Branch("trk_dhits", &m_trk_dhits);
@@ -1877,6 +1881,7 @@ void L1TrackObjectNtupleMaker::analyze(const edm::Event& iEvent, const edm::Even
     m_trk_chi2rz->clear();
     m_trk_bendchi2->clear();
     m_trk_MVA1->clear();
+    m_trk_MVAQuality->clear();
     m_trk_nstub->clear();
     m_trk_lhits->clear();
     m_trk_dhits->clear();
@@ -2534,6 +2539,7 @@ void L1TrackObjectNtupleMaker::analyze(const edm::Event& iEvent, const edm::Even
       float tmp_trk_chi2rz = iterL1Track->chi2ZRed();
       float tmp_trk_bendchi2 = iterL1Track->chi2BendRed();
       float tmp_trk_MVA1 = iterL1Track->trkMVA1();
+      float tmp_trk_MVAQuality = iterL1Track->getMVAQuality();
 
       std::vector<edm::Ref<edmNew::DetSetVector<TTStub<Ref_Phase2TrackerDigi_>>, TTStub<Ref_Phase2TrackerDigi_>>>
           stubRefs = iterL1Track->getStubRefs();
@@ -2622,6 +2628,7 @@ void L1TrackObjectNtupleMaker::analyze(const edm::Event& iEvent, const edm::Even
       m_trk_chi2rz->push_back(tmp_trk_chi2rz);
       m_trk_bendchi2->push_back(tmp_trk_bendchi2);
       m_trk_MVA1->push_back(tmp_trk_MVA1);
+      m_trk_MVAQuality->push_back(tmp_trk_MVAQuality);
       m_trk_nstub->push_back(tmp_trk_nstub);
       m_trk_dhits->push_back(tmp_trk_dhits);
       m_trk_lhits->push_back(tmp_trk_lhits);

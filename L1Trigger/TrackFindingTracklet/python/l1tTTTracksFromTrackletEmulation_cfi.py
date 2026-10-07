@@ -18,7 +18,7 @@ l1tTTTracksFromTrackletEmulation = cms.EDProducer("L1FPGATrackProducer",
                                                FailScenario = cms.untracked.int32(0),
                                                Extended = cms.bool(False),
                                                Reduced = cms.bool(False),
-                                               Hnpar = cms.uint32(4),
+                                               Hnpar = cms.uint32(5),
                                                # These 3 files only used for extended or reduced mode.
                                                memoryModulesFile = cms.FileInPath('L1Trigger/TrackFindingTracklet/data/memorymodules_hourglassExtendedAllCombined.dat'),
                                                processingModulesFile = cms.FileInPath('L1Trigger/TrackFindingTracklet/data/processingmodules_hourglassExtendedAllCombined.dat'),

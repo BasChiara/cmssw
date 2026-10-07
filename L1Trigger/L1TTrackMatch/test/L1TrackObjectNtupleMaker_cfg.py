@@ -43,10 +43,11 @@ process.MessageLogger.cerr.INFO.limit = cms.untracked.int32(0) # default: 0
 # input and output
 ############################################################
 
-process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(20))
+process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(100))
 
 readFiles = cms.untracked.vstring(
-    '/store/mc/Phase2Spring23DIGIRECOMiniAOD/TT_TuneCP5_14TeV-powheg-pythia8/GEN-SIM-DIGI-RAW-MINIAOD/PU200_L1TFix_Trk1GeV_131X_mcRun4_realistic_v9-v1/50000/1cc5c14c-5bae-4e68-a369-04e230788660.root'
+    '/store/mc/Phase2Spring24DIGIRECOMiniAOD/MinBias_TuneCP5_14TeV-pythia8/GEN-SIM-DIGI-RAW-MINIAOD/PU200ALCA_140X_mcRun4_realistic_v4-v2/130000/d37d8724-29b6-4cbc-ba8a-5fd3bf866f6e.root'
+    #'file:/afs/cern.ch/work/c/cbasile/L1scouting/CMSSW_16_1_0/src/L1Trigger/L1TGlobal/test/L1TReRun.root'
 )
 secFiles = cms.untracked.vstring()
 
@@ -62,7 +63,7 @@ process.Timing = cms.Service("Timing",
   useJobReport = cms.untracked.bool(False)
 )
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string('GTTObjects_ttbar200PU_Spring23.root'), closeFileFast = cms.untracked.bool(True))
+process.TFileService = cms.Service("TFileService", fileName = cms.string('GTTObjects_MinBias_cmssw161X_TQ2023.root'), closeFileFast = cms.untracked.bool(True))
 
 
 ############################################################
